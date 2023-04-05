@@ -32,8 +32,8 @@ inflation_data <- readr::read_csv(
 
 inflation_data[c('year', 'quarter')] <- str_split_fixed(inflation_data$date, ' ', 2)
 
-# inflation_data <- inflation_data |>
-#  filter(year >= 1990)
+inflation_data <- inflation_data |>
+  filter(year >= 2017)
 
 # inflation_data$year <- paste(inflation_data$year, inflation_data$quarter)
 # 

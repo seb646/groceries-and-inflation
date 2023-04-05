@@ -1,5 +1,4 @@
-# Inflation's Impact on Grocery Stores: Can household groceries track inflation?
-
+# Can household groceries track inflation? 
 
 > **Note**<br>
 > The research paper associated with this study is available [here](https://github.com/seb646/groceries-and-inflation/blob/main/outputs/paper/paper.pdf).
