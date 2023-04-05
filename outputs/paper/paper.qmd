@@ -1,0 +1,689 @@
+---
+title: "Inflation's Impact on Grocery Stores: Can household groceries track inflation?"
+format: pdf
+author: "Sebastian Rodriguez"
+abstract: "Inflation something."
+date: today
+date-format: long
+editor: visual
+toc: TRUE
+number-sections: TRUE
+bibliography: references.bib
+thanks: "Code supporting this analysis is available at: https://github.com/seb646/groceries-and-inflation"
+---
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| output: false
+#### Preamble ####
+# Title: The Response Time of Toronto's Paramedic Service: How effective is the city's emergency medical care?
+# Author: Sebastian Rodriguez
+# Email: me@srod.ca
+# Date: 3 February 2023
+# GitHub: https://github.com/seb646/toronto-paramedic-responses
+
+#### Workspace set-up ####
+# Define required libraries 
+library(lubridate)
+library(tidyverse)
+library(dplyr)
+library(knitr)
+library(janitor)
+library(scales)
+library(RColorBrewer)
+library(ggplot2)
+library(kableExtra)
+library(here)
+library(readr)
+library(arrow)
+library(gridExtra)
+
+# Fetch the the clean response data
+inflation_data <- arrow::read_parquet(here::here("inputs/data/clean_inflation.parquet"), show_col_types = FALSE)
+
+# Fetch clean performance data
+grocery_data <- arrow::read_parquet(here::here("inputs/data/clean_grocery.parquet"), show_col_types = FALSE)
+
+inflation_graph <- inflation_data |>
+  # Plot graphs, define x axis
+  ggplot(aes(x = year, y = inflation_data$inflation_rate, group = 1)) +
+
+  # Define axis labels
+  labs(
+    y = "Inflation Rate (%)",
+    x = "Year"
+  ) +
+
+  # Set the theme
+  theme_minimal() +
+  
+  theme(
+    axis.title.x = element_text(size = 15),
+    axis.text.x = element_text(size = 14, angle = 50, vjust = 0.5),
+    axis.title.y = element_text(size = 15),
+    axis.text.y = element_text(size = 14),
+  ) +
+
+  # Define styles for axis, legends, and labels
+  theme(
+    axis.text.x = element_text(angle = 50, vjust = 0.5),
+  ) +
+  
+  # Render line
+  geom_line()
+```
+
+## Introduction
+Inflation is the pervasive and sustained increase in the cost of goods and services, and it has become a significant concern for economies worldwide. Inflation is most often observed as an impact on a currency’s purchasing power, but it also has far-reaching effects on the affordability of household goods. In Canada, the inflation rate is tracked by the consumer price index, or CPI, which is an amalgamation of the cost of goods and services around the country. For example, if the price of energy increases, so too does the CPI, which in turn increases the rate of inflation. If the inflation rate becomes too high (or too low), it can indicate serious problems for a country’s economy and has lasting financial implications for the country’s population. 
+
+In 2022, Canada’s average rate of inflation was 6.7% – a record high not seen since the 1980s. This reflected a rise in the price of goods and services, like energy and food, for Canadians. One of the areas where inflation rates are arguably most observable is daily grocery store purchases. In fact, one study shows that “household-level grocery price changes significantly shape[s] inflation expectations” (). It is important to note that the researchers specify expectations, rather than reality, as inflation is tracked by the larger CPI, which includes housing, energy, clothing, and other items in addition to food. Still, this perception influences how Canadians understand their country’s economic situation. As food is a factor considered by the CPI, it is logical to draw a connection between the two factors. 
+
+This paper investigates whether grocery store items can track Canada’s inflation rate. It uses data from Statistics Canada to measure the 5-year cost history of common grocery store items, including chicken breasts, bacon, milk, eggs, frozen peas, and pasta sauce. It also uses data from the Bank of Canada to graph the yearly averages of inflation rates from 2017 to 2022.By examining the percent increases in the cost of these food items, it explores the existence of a relationship between the cost of food and inflation to determine whether food is a useful indicator in tracking inflation. 
+
+Preliminary results indicate that food is not a reliable metric for tracking inflation, as the cost of food increased at rates beyond inflation during the observed period. While food cost certainly plays a role in the country’s overall CPI and inflation rate. Canadians should not solely depend on the cost of food to assess the country’s inflation rate.
+
+
+ \newpage
+
+## Measurement
+
+## Inflation Rates and Grocery Products
+
+### Chicken Breasts (per 3 kilograms)
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-1
+#| fig-cap: "Inflation Rate vs. Cost of Chicken Breasts (since 2017)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+# Define colors to be used in legend
+chicken_graph <- grocery_data |>
+  # Plot graphs, define x axis
+  ggplot(aes(x = year, y = grocery_data$chicken, group = 1)) +
+
+  # Define axis labels
+  labs(
+    y = "Cost ($)",
+    x = "Year"
+  ) +
+
+  # Set the theme
+  theme_minimal() +
+
+  # Define styles for axis and labels
+  theme(
+    axis.title.x = element_text(size = 15),
+    axis.text.x = element_text(size = 14, angle = 50, vjust = 0.5),
+    axis.title.y = element_text(size = 15),
+    axis.text.y = element_text(size = 14),
+  ) +
+  
+  scale_y_continuous(limits=c(10, 15)) +
+
+  # Render lines
+  geom_line()
+
+grid.arrange(chicken_graph, inflation_graph, ncol=2)
+```
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-2
+#| fig-cap: "Inflation Rate vs. Price of Chicken Breasts (since 2017)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+# Define colors to be used in legend
+chicken_table <- grocery_data |>
+  select(year, chicken)
+
+chicken_inflation_data <-
+  # Specify which tables to merge (this merges by row)
+  merge(
+    x = chicken_table,
+    y = inflation_data, 
+    by = "year",
+    all.x = TRUE
+  ) |>
+  
+  # Calculate the percent change of chicken prices
+  mutate(percent_change = round((((chicken - lag(chicken, 1)) / lag(chicken, 1)) * 100), digits = 2)) |> 
+  
+  # Remove empty rows
+  drop_na() |>
+  
+  # Change months to fiscal quarters
+  mutate(chicken =  paste("\\$", chicken, sep = "")) |>
+  mutate(percent_change =  paste(percent_change, "\\%", sep = "")) |>
+  mutate(inflation_rate =  paste(inflation_rate, "\\%", sep = "")) |>
+
+  # Order the columns 
+  select(year, chicken, percent_change, inflation_rate) |>
+  
+  # Rename the columns
+  rename(
+    "Year" = "year",
+    "Chicken Cost" = "chicken",
+    "Inflation Rate" = "inflation_rate",
+    "Chicken Cost Rate" = "percent_change"
+  )
+
+# summary <- chicken_inflation_data |>
+#     summarize(across(where(is.numeric), mean, na.rm = TRUE))
+# 
+# chicken_inflation_data <- bind_rows(
+#   chicken_inflation_data,
+#   summary
+# )
+# summary
+
+chicken_inflation_data |>
+  knitr::kable(align = "l", booktabs = TRUE, escape = FALSE, linesep = "" )|>
+  kable_styling(font_size = 10, latex_options = "hold_position", full_width = TRUE)
+  # pack_rows("Average", start_row = 6, end_row = 6)
+
+```
+\newpage
+
+### Bacon (per 500 grams)
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-3
+#| fig-cap: "Inflation Rate vs. Cost of Bacon (since 2017)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+bacon <- grocery_data |>
+  # Plot graphs, define x axis
+  ggplot(aes(x = year, y = grocery_data$bacon, group = 1)) +
+
+  # Define axis labels
+  labs(
+    y = "Cost ($)",
+    x = "Year"
+  ) +
+
+  # Set the theme
+  theme_minimal() +
+  
+  # Define styles for axis and labels
+  theme(
+    axis.title.x = element_text(size = 15),
+    axis.text.x = element_text(size = 14, angle = 50, vjust = 0.5),
+    axis.title.y = element_text(size = 15),
+    axis.text.y = element_text(size = 14),
+  ) +
+  
+  scale_y_continuous(limits=c(5, 10)) +
+
+  # Render lines
+  geom_line()
+
+grid.arrange(bacon, inflation_graph, ncol=2)
+```
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-4
+#| fig-cap: "Inflation Rate vs. Cost of Bacon (since 2017)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+# Define colors to be used in legend
+bacon_table <- grocery_data |>
+  select(year, bacon)
+
+bacon_inflation_data <-
+  # Specify which tables to merge (this merges by row)
+  merge(
+    x = bacon_table,
+    y = inflation_data, 
+    by = "year",
+    all.x = TRUE
+  ) |>
+  
+  # Calculate the percent change of chicken prices
+  mutate(percent_change = round((((bacon - lag(bacon, 1)) / lag(bacon, 1)) * 100), digits = 2)) |> 
+
+  # Remove empty rows
+  drop_na() |>
+  
+  # Change months to fiscal quarters
+  mutate(bacon =  paste("\\$", bacon, sep = "")) |>
+  mutate(percent_change =  paste(percent_change, "\\%", sep = "")) |>
+  mutate(inflation_rate =  paste(inflation_rate, "\\%", sep = "")) |>
+  
+  # Order the columns 
+  select(year, bacon, percent_change, inflation_rate) |> 
+  
+  # Rename the columns
+  rename(
+    "Year" = "year", 
+    "Bacon Cost" = "bacon", 
+    "Inflation Rate" = "inflation_rate", 
+    "Bacon Cost Rate" = "percent_change"
+  )
+
+bacon_inflation_data |>
+  knitr::kable(align = "l", booktabs = TRUE, escape = FALSE, linesep = "" )|>
+  kable_styling(font_size = 10, latex_options = "hold_position", full_width = TRUE)
+
+```
+\newpage
+
+### Milk (per 2 litres)
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-5
+#| fig-cap: "Inflation Rate vs. Cost of Milk (since 2017)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+milk <- grocery_data |>
+  # Plot graphs, define x axis
+  ggplot(aes(x = year, y = grocery_data$milk, group = 1)) +
+
+  # Define axis labels
+  labs(
+    y = "Cost ($)",
+    x = "Year"
+  ) +
+
+  # Set the theme
+  theme_minimal() +
+
+  # Define styles for axis and labels
+  theme(
+    axis.title.x = element_text(size = 15),
+    axis.text.x = element_text(size = 14, angle = 50, vjust = 0.5),
+    axis.title.y = element_text(size = 15),
+    axis.text.y = element_text(size = 14),
+  ) +
+  
+  scale_y_continuous(limits=c(0, 5)) +
+
+  # Render lines
+  geom_line()
+
+grid.arrange(milk, inflation_graph, ncol=2)
+```
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-6
+#| fig-cap: "Inflation Rate vs. Cost of Milk (since 2017)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+# Define colors to be used in legend
+milk_table <- grocery_data |>
+  select(year, milk)
+
+milk_inflation_data <-
+  # Specify which tables to merge (this merges by row)
+  merge(
+    x = milk_table,
+    y = inflation_data, 
+    by = "year",
+    all.x = TRUE
+  ) |>
+  
+  # Calculate the percent change of chicken prices
+  mutate(percent_change = round((((milk - lag(milk, 1)) / lag(milk, 1)) * 100), digits = 2)) |> 
+
+  # Remove empty rows
+  drop_na() |>
+  
+  # Change months to fiscal quarters
+  mutate(milk =  paste("\\$", milk, sep = "")) |>
+  mutate(percent_change =  paste(percent_change, "\\%", sep = "")) |>
+  mutate(inflation_rate =  paste(inflation_rate, "\\%", sep = "")) |>
+  
+  # Order the columns 
+  select(year, milk, percent_change, inflation_rate) |> 
+  
+  # Rename the columns
+  rename(
+    "Year" = "year", 
+    "Milk Cost" = "milk", 
+    "Inflation Rate" = "inflation_rate", 
+    "Milk Cost Rate" = "percent_change"
+  )
+
+milk_inflation_data |>
+  knitr::kable(align = "l", booktabs = TRUE, escape = FALSE, linesep = "" )|>
+  kable_styling(font_size = 10, latex_options = "hold_position", full_width = TRUE)
+
+```
+\newpage
+
+### Eggs (per 1 dozen)
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-7
+#| fig-cap: "Inflation Rate vs. Cost of Eggs (since 2017)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+eggs <- grocery_data |>
+  # Plot graphs, define x axis
+  ggplot(aes(x = year, y = grocery_data$eggs, group = 1)) +
+
+  # Define axis labels
+  labs(
+    y = "Cost ($)",
+    x = "Year"
+  ) +
+
+  # Set the theme
+  theme_minimal() +
+
+  # Define styles for axis and labels
+  theme(
+    axis.title.x = element_text(size = 15),
+    axis.text.x = element_text(size = 14, angle = 50, vjust = 0.5),
+    axis.title.y = element_text(size = 15),
+    axis.text.y = element_text(size = 14),
+  ) +
+  
+  scale_y_continuous(limits=c(0, 5)) +
+
+  # Render lines
+  geom_line()
+
+grid.arrange(eggs, inflation_graph, ncol=2)
+```
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-8
+#| fig-cap: "Inflation Rate vs. Cost of Eggs (since 2017)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+# Define colors to be used in legend
+eggs_table <- grocery_data |>
+  select(year, eggs)
+
+eggs_inflation_data <-
+  # Specify which tables to merge (this merges by row)
+  merge(
+    x = eggs_table,
+    y = inflation_data, 
+    by = "year",
+    all.x = TRUE
+  ) |>
+  
+  # Calculate the percent change of chicken prices
+  mutate(percent_change = round((((eggs - lag(eggs, 1)) / lag(eggs, 1)) * 100), digits = 2)) |> 
+
+  # Remove empty rows
+  drop_na() |>
+  
+  # Change months to fiscal quarters
+  mutate(eggs =  paste("\\$", eggs, sep = "")) |>
+  mutate(percent_change =  paste(percent_change, "\\%", sep = "")) |>
+  mutate(inflation_rate =  paste(inflation_rate, "\\%", sep = "")) |>
+  
+  # Order the columns 
+  select(year, eggs, percent_change, inflation_rate) |> 
+  
+  # Rename the columns
+  rename(
+    "Year" = "year", 
+    "Eggs Cost" = "eggs", 
+    "Inflation Rate" = "inflation_rate", 
+    "Eggs Cost Rate" = "percent_change"
+  )
+
+eggs_inflation_data |>
+  knitr::kable(align = "l", booktabs = TRUE, escape = FALSE, linesep = "" )|>
+  kable_styling(font_size = 10, latex_options = "hold_position", full_width = TRUE)
+
+```
+\newpage
+
+### Frozen Peas (per 750 grams)
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-9
+#| fig-cap: "Inflation Rate vs. Cost of Frozen Peas (since 2017)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+frozen_peas <- grocery_data |>
+  # Plot graphs, define x axis
+  ggplot(aes(x = year, y = grocery_data$frozen_peas, group = 1)) +
+
+  # Define axis labels
+  labs(
+    y = "Cost ($)",
+    x = "Year"
+  ) +
+
+  # Set the theme
+  theme_minimal() +
+
+  # Define styles for axis and labels
+  theme(
+    axis.title.x = element_text(size = 15),
+    axis.text.x = element_text(size = 14, angle = 50, vjust = 0.5),
+    axis.title.y = element_text(size = 15),
+    axis.text.y = element_text(size = 14),
+  ) +
+
+  scale_y_continuous(limits=c(0, 5)) +
+  
+  # Render lines
+  geom_line()
+
+grid.arrange(frozen_peas, inflation_graph, ncol=2)
+```
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-10
+#| fig-cap: "Inflation Rate vs. Cost of Frozen Peas (since 2017)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+# Define colors to be used in legend
+frozen_peas_table <- grocery_data |>
+  select(year, frozen_peas)
+
+frozen_peas_inflation_data <-
+  # Specify which tables to merge (this merges by row)
+  merge(
+    x = frozen_peas_table,
+    y = inflation_data, 
+    by = "year",
+    all.x = TRUE
+  ) |>
+  
+  # Calculate the percent change of chicken prices
+  mutate(percent_change = round((((frozen_peas - lag(frozen_peas, 1)) / lag(frozen_peas, 1)) * 100), digits = 2)) |> 
+
+  # Remove empty rows
+  drop_na() |>
+  
+  # Change months to fiscal quarters
+  mutate(frozen_peas =  paste("\\$", frozen_peas, sep = "")) |>
+  mutate(percent_change =  paste(percent_change, "\\%", sep = "")) |>
+  mutate(inflation_rate =  paste(inflation_rate, "\\%", sep = "")) |>
+  
+  # Order the columns 
+  select(year, frozen_peas, percent_change, inflation_rate) |> 
+  
+  # Rename the columns
+  rename(
+    "Year" = "year", 
+    "Frozen Peas Cost" = "frozen_peas", 
+    "Inflation Rate" = "inflation_rate", 
+    "Frozen Peas Cost Rate" = "percent_change"
+  )
+
+frozen_peas_inflation_data |>
+  knitr::kable(align = "l", booktabs = TRUE, escape = FALSE, linesep = "" )|>
+  kable_styling(font_size = 10, latex_options = "hold_position", full_width = TRUE)
+```
+\newpage
+
+### Pasta Sauce (per 650 millilitres)
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-11
+#| fig-cap: "Inflation Rate vs. Cost of Pasta Sauce (since 2017)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+pasta_sauce <- grocery_data |>
+  # Plot graphs, define x axis
+  ggplot(aes(x = year, y = grocery_data$pasta_sauce, group = 1)) +
+
+  # Define axis labels
+  labs(
+    y = "Cost ($)",
+    x = "Year"
+  ) +
+
+  # Set the theme
+  theme_minimal() +
+
+  # Define styles for axis and labels
+  theme(
+    axis.title.x = element_text(size = 15),
+    axis.text.x = element_text(size = 14, angle = 50, vjust = 0.5),
+    axis.title.y = element_text(size = 15),
+    axis.text.y = element_text(size = 14),
+  ) +
+  
+  scale_y_continuous(limits=c(0, 5)) +
+
+  # Render lines
+  geom_line()
+
+grid.arrange(pasta_sauce, inflation_graph, ncol = 2)
+```
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-12
+#| fig-cap: "Inflation Rate vs. Cost of Pasta (since 2017)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+# Define colors to be used in legend
+pasta_sauce_table <- grocery_data |>
+  select(year, pasta_sauce)
+
+pasta_sauce_inflation_data <-
+  # Specify which tables to merge (this merges by row)
+  merge(
+    x = pasta_sauce_table,
+    y = inflation_data, 
+    by = "year",
+    all.x = TRUE
+  ) |>
+  
+  # Calculate the percent change of chicken prices
+  mutate(percent_change = round((((pasta_sauce - lag(pasta_sauce, 1)) / lag(pasta_sauce, 1)) * 100), digits = 2)) |> 
+
+  # Remove empty rows
+  drop_na() |>
+  
+  # Change months to fiscal quarters
+  mutate(pasta_sauce =  paste("\\$", pasta_sauce, sep = "")) |>
+  mutate(percent_change =  paste(percent_change, "\\%", sep = "")) |>
+  mutate(inflation_rate =  paste(inflation_rate, "\\%", sep = "")) |>
+  
+  # Order the columns 
+  select(year, pasta_sauce, percent_change, inflation_rate) |> 
+  
+  # Rename the columns
+  rename(
+    "Year" = "year", 
+    "Pasta Sauce Cost" = "pasta_sauce", 
+    "Inflation Rate" = "inflation_rate", 
+    "Pasta Sauce Cost Rate" = "percent_change"
+  )
+
+pasta_sauce_inflation_data |>
+  knitr::kable(align = "l", booktabs = TRUE, escape = FALSE, linesep = "" )|>
+  kable_styling(font_size = 10, latex_options = "hold_position", full_width = TRUE)
+```
+\newpage
+
+## Results
+
+## Discussion
+
+\newpage
+
+## Inclusive Acknowledgements
+
+**Land Acknowledgement**
+
+We wish to acknowledge the land on which this data was analyzed. For thousands of years, it has been the traditional land of the Huron-Wendat, the Seneca, and the Mississaugas of the Credit. Today, this meeting place is still the home to many Indigenous people from across Turtle Island and we are grateful to have the opportunity to work on this land.
+
+This statement was originally prepared in consultation with First Nations House and the Elders Circle for use at the University of Toronto [@cite_land_acknowledgement].\
+
+**Data Acknowledgement**
+
+The data used in this paper was obtained through Open Data Toronto, an initiative to provide openly accessible data about the city [@cite_about_opendatatoronto]. This paper uses three data sets from Open Data Toronto, each provided by the Toronto Paramedic Services:
+
+-   Paramedic Services Incident Data[^1]
+-   Land Ambulance Response Time Standard[^2]
+-   Pre-Hospital Emergency Care Performance Metrics[^3]
+
+[^1]: Paramedic Services Incident Data is available at: https://open.toronto.ca/dataset/paramedic-services-incident-data
+
+[^2]: Land Ambulance Response Time Standard is available at: https://open.toronto.ca/dataset/land-ambulance-response-time-standard
+
+[^3]: Pre-Hospital Emergency Care Performance Metrics is available at: https://open.toronto.ca/dataset/pre-hospital-emergency-care-performance-metrics
+
+**Resources Acknowledgment**
+
+The primary tool used to analyse data in this paper is R, an open-source statistical programming language [@cite_tool_r]. The paper also uses a number of R packages, including: dplyr [@cite_tool_dplyr], ggplot2 [@cite_tool_ggplot2], here [@cite_tool_here], janitor [@cite_tool_janitor], kableExtra [@cite_tool_kableextra], knitr [@cite_tool_knitr], lubridate [@cite_tool_lubridate], opendatatoronto [@cite_tool_opendatatoronto], readr [@cite_tool_readr], RColorBrewer [@cite_tool_rcolorbrewer], scales [@cite_tool_scales], and tidyverse [@cite_tool_tidyverse]. \newpage
+
+## References
+
+<!-- Comment required to show references as a numbered section -->
