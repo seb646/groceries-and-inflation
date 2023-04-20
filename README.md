@@ -16,7 +16,7 @@ Once your environment is set up, you must install several packages that handle v
 The first step in working with this repository is downloading two data sets: one from Statistics Canada, and one from the Bank of Canada:
 
 - The Bank of Canada's inflation data set is available [here](https://www.bankofcanada.ca/rates/indicators/capacity-and-inflation-pressures/inflation). Download the data in a CSV format.
-- Statistics Canada's data set on the price of retail products is available [here](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810024501). Downloading the correct data from this data set is an involved process, and a step-by-step guide is available [here](). 
+- Statistics Canada's data set on the price of retail products is available [here](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810024501). Downloading the correct data from this data set is an involved process, and a step-by-step guide is available [here](https://github.com/seb646/groceries-and-inflation/blob/main/guides/00-download_statcan_data.md). 
 
 Once you download both data sets, place the two CSV files in `inputs/data`. At the end of this process, you should have two files in the aforementioned folder:
 
