@@ -78,7 +78,7 @@ The Bank of Canada, which calculates and posts metrics on the country's inflatio
 ### Data Analysis
 This paper uses data from both Statistics Canada's Consumer Price Index (CPI) and the Bank of Canada's Inflation Rate measurements. 
 
-Within the CPI, the paper specifically examines 6 variables representing different food items: bacon (per 500 grams), eggs (per 1 dozen), chicken breasts (per 3 kilograms), milk (per 2 liters), frozen peas (per 750 grams), and pasta sauce (per 650 milliliters). These 6 food items were selected as a representation of various food types and groups, allowing an analysis of meats, dairy, frozen goods, and shelf-stable food. The CPI displays a price of each food item by month of a given year, and was subsequently cleaned to find the average of a given year. Limitations in the history of the data only allow for analysis from 2017 up to 2022. Once the data was cleaned, a cost rate (the difference in price of a given year against the previous year) was calculated to show the change in price in order to measure the food item against inflation. It is important to note that, since the data only extends to 2017, a cost rate analysis from the years 2018 to 2022. 
+Within the CPI, the paper specifically examines 6 variables representing different food items: bacon (per 500 grams), eggs (per 1 dozen), chicken breasts (per kilogram), milk (per 2 liters), frozen peas (per 750 grams), and pasta sauce (per 650 milliliters). These 6 food items were selected as a representation of various food types and groups, allowing an analysis of meats, dairy, frozen goods, and shelf-stable food. The CPI displays a price of each food item by month of a given year, and was subsequently cleaned to find the average of a given year. Limitations in the history of the data only allow for analysis from 2017 up to 2022. Once the data was cleaned, a cost rate (the difference in price of a given year against the previous year) was calculated to show the change in price in order to measure the food item against inflation. It is important to note that, since the data only extends to 2017, a cost rate analysis from the years 2018 to 2022. 
 
 The rate of inflation measurements similarly recorded data month-to-month and required cleaning to show the yearly average. Although the inflation rate data set provided a far more robust history, only the years 2017 to 2022 were included in this analysis as inflation was only used as a comparison against food cost rates. 
 
@@ -295,7 +295,7 @@ eggs_table_display |>
 
 In the given time period, eggs were not a reliable metric for monitoring inflation due to its consistent high increases comparative to inflation. The relatively low cost of eggs also makes this difference far less visible over the short term. Because of these factors, eggs should not be used to track inflation.
 
-### Chicken Breasts (per 3 kilograms)
+### Chicken Breasts (per kilogram)
 The cost of chicken fluctuated significantly over the analyzed time period, falling either below or above the year's inflation rate by statistically significant margins. On average, the cost of eggs increased by 4.28% while the inflation rate increased by 3.04%, showing increases more than double inflation. The highest price increase was between 2021 and 2022, which saw an increase 13.01% from \$12.84 to \$14.51. The relatively high cost of chicken makes cost changes far more visible to consumers, thus having a significant influence on the perception of inflation.
 
 ```{r}
