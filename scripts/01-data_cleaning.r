@@ -2,7 +2,7 @@
 # Purpose: Import raw csv data, clean it, and generate new csv files
 # Author: Sebastian Rodriguez
 # Email: me@srod.ca
-# Date: TBD
+# Date: April 20, 2023
 # GitHub: https://github.com/seb646/groceries-and-inflation
 
 #### Workspace set-up ####

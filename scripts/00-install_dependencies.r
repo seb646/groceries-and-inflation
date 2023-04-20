@@ -3,7 +3,7 @@
 # Prerequisites: You must also have the R language installed
 # Author: Sebastian Rodriguez
 # Email: me@srod.ca
-# Date: TBD
+# Date: April 20, 2023
 # GitHub: https://github.com/seb646/groceries-and-inflation
 
 # Install required packages (you only need to do this once)
@@ -17,6 +17,4 @@ install.packages("RColorBrewer")
 install.packages("ggplot2")
 install.packages("kableExtra")
 install.packages("here")
-install.packages("readr")
 install.packages("arrow")
-install.packages("gridExtra")

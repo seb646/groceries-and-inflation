@@ -1,8 +1,9 @@
 ---
 title: "Bacon, Eggs, and Inflation: Can household groceries track inflation?"
 format: pdf
-author: "Sebastian Rodriguez"
-abstract: "Canada’s average inflation rate in 2022 was 6.7%, a figure not seen since the 1980s. This inflation rate reflects an increase in the cost of goods and services (determined by the consumer price index) and impacts the wallets of people across the nation. Studies show that the price of household groceries directly influences inflation expectations. This paper investigates whether the cost of groceries can track Canada’s inflation rate, examining common items like bacon, eggs, chicken, milk, frozen peas, and pasta sauce. Preliminary data from Statistics Canada and the Bank of Canada reveals that the cost rate of common groceries often exceeds the rate of inflation, and Canadians should not solely rely on grocery prices to assess the inflation rate."
+author: 
+- Sebastian Rodriguez
+abstract: "Canada’s average inflation rate in 2022 was 6.7%, a figure not seen since the 1980s. This inflation rate reflects an increase in the cost of goods and services (determined by the consumer price index) and impacts the wallets of people across the nation. Studies show that the price of household groceries directly influences inflation expectations. This paper investigates whether the cost of groceries can track Canada’s inflation rate, examining common items like bacon, eggs, chicken, milk, frozen peas, and pasta sauce. An analysis of data from Statistics Canada and the Bank of Canada reveals that the cost rate increase of common groceries often exceeds the rate of inflation, and Canadians should look elsewhere to assess the inflation rate."
 date: today
 date-format: long
 editor: visual
@@ -21,7 +22,7 @@ thanks: "See the GitHub repository supporting this analysis: https://github.com/
 # Title: Bacon, Eggs, and Inflation: Can household groceries track inflation?
 # Author: Sebastian Rodriguez
 # Email: me@srod.ca
-# Date: TBD
+# Date: April 20, 2023
 # GitHub: ttps://github.com/seb646/groceries-and-inflation
 
 #### Workspace set-up ####
@@ -36,43 +37,13 @@ library(RColorBrewer)
 library(ggplot2)
 library(kableExtra)
 library(here)
-library(readr)
 library(arrow)
-library(gridExtra)
 
-# Fetch the the clean response data
+# Fetch the the clean inflation data
 inflation_data <- arrow::read_parquet(here::here("inputs/data/clean_inflation.parquet"), show_col_types = FALSE)
 
-# Fetch clean performance data
+# Fetch clean CPI grocery item data
 grocery_data <- arrow::read_parquet(here::here("inputs/data/clean_grocery.parquet"), show_col_types = FALSE)
-
-inflation_graph <- inflation_data |>
-  # Plot graphs, define x axis
-  ggplot(aes(x = year, y = inflation_data$inflation_rate, group = 1)) +
-
-  # Define axis labels
-  labs(
-    y = "Inflation Rate (%)",
-    x = "Year"
-  ) +
-
-  # Set the theme
-  theme_minimal() +
-  
-  theme(
-    axis.title.x = element_text(size = 15),
-    axis.text.x = element_text(size = 14, angle = 50, vjust = 0.5),
-    axis.title.y = element_text(size = 15),
-    axis.text.y = element_text(size = 14),
-  ) +
-
-  # Define styles for axis, legends, and labels
-  theme(
-    axis.text.x = element_text(angle = 50, vjust = 0.5),
-  ) +
-  
-  # Render line
-  geom_line()
 ```
 
 ## Introduction
@@ -81,66 +52,46 @@ Inflation is the pervasive and sustained increase in the cost of goods and servi
 
 In 2022, Canada's average rate of inflation was 6.7% -- a record high not seen since the 1980s [@cite_td]. This reflected a rise in the price of goods and services, like energy and food, for Canadians. One of the areas where inflation rates are arguably most observable is daily grocery store purchases. In fact, one study shows that "household-level grocery price changes significantly shape\[s\] inflation expectations" [@cite_study_1]. It is important to note that the researchers specify expectations, rather than reality, as inflation is tracked by the larger CPI, which includes housing, energy, clothing, and other items in addition to food. Still, this perception influences how Canadians understand their country's economic situation. As food is a factor considered by the CPI, it is logical to draw a connection between the two factors.
 
-This paper investigates whether grocery store items can track Canada's inflation rate. It uses data from Statistics Canada to measure the 5-year cost history of common grocery store items, including bacon, eggs, chicken, milk, frozen peas, and pasta sauce [@cite_data_statscan]. It also uses data from the Bank of Canada to graph the yearly averages of inflation rates from 2017 to 2022 [@cite_data_boc]. By examining the percent increases in the cost of these food items, it explores the existence of a relationship between the cost of food and inflation to determine whether food is a useful indicator in tracking inflation.
+This paper investigates whether grocery store items can track Canada's inflation rate. It uses data from Statistics Canada to measure the 5-year cost history of common grocery store items, including bacon, eggs, chicken, milk, frozen peas, and pasta sauce [@cite_data_statscan]. It also uses data from the Bank of Canada to graph the yearly averages of inflation rates from 2017 to 2022 [@cite_data_boc]. By examining the percent increases in the cost of these food items, it questions and explores the existence of a relationship between the cost of food and inflation to determine whether food is a useful indicator in tracking inflation.
 
-Preliminary results indicate that food is not a reliable metric for tracking inflation, as the cost of food increased at rates beyond inflation during the observed period. While food cost certainly plays a role in the country's overall CPI and inflation rate. Canadians should not solely depend on the cost of food to assess the country's inflation rate.
+The estimand of this analysis is the cost rate of each selected food item from the Consumer Price Index, measured against the Bank of Canada's overall rate of inflation. 
+
+The analysis indicates that food is not a reliable metric for tracking inflation, as the cost of food often increased at rates beyond inflation during the observed period. While food cost certainly plays a role in the country's overall CPI, and thus the inflation rate, Canadians should not solely depend on the cost of food to assess the country's inflation rate.
 
 \newpage
 
-## Measurement
+## Data
 
-## Inflation Rates and Grocery Products
+### Measurement
+The data used in this paper comes from Statistics Canada's Consumer Price Index (CPI), an index used to track "changes in consumer prices experienced by Canadians" [@cite_statcan_cpi_survey]. The CPI is a weighted average of common household goods and services, such as food, gas, housing, etc.
 
+Statistics Canada updates the CPI every month through a survey of "families and individuals living in urban and rural private households in Canada," excluding students living in full-time residence, people living on Indigenous reserves, and representatives of foreign nations [@cite_statcan_cpi_survey]. 
+
+The survey completed by Canadians is sample-based, obtained from "a selection of geographical areas, representative goods and services, and types and locations of retail outlets," in order to "estimate price changes experienced by Canadians" [@cite_statcan_cpi_survey]. Geographical distribution of the sample also "varies by product" and can be "heavily influenced by local market conditions" [@cite_statcan_cpi_survey]. 
+
+The sample survey is mandatory for the Canadians selected to be part of the analysis. In addition to collecting responses directly from consumers, Statistics Canada also collects data from government (federal, provincial, and municipal) administrative files, other Statistics Canada surveys, and other sources. 
+
+Although Statistics Canada has a rigorous error detection system---with price collectors reporting "reasons for large or unusual price changes," "automated edit checks" on prices, and follow-up investigations for "unusual price changes"---reliability of the data is often "difficult to assess" [@cite_statcan_cpi_survey]. The sample surveys are subject to sampling error, which is often difficult to quantify because it is "based on judgmental rather than probability sampling methods" [@cite_statcan_cpi_survey]. 
+
+The Bank of Canada, which calculates and posts metrics on the country's inflation rates, uses Statistics Canada's Consumer Price Index for their calculation and thus follows identical measurement guidelines [@cite_data_boc]. 
+
+### Data Analysis
+This paper uses data from both Statistics Canada's Consumer Price Index (CPI) and the Bank of Canada's Inflation Rate measurements. 
+
+Within the CPI, the paper specifically examines 6 variables representing different food items: bacon (per 500 grams), eggs (per 1 dozen), chicken breasts (per 3 kilograms), milk (per 2 liters), frozen peas (per 750 grams), and pasta sauce (per 650 milliliters). These 6 food items were selected as a representation of various food types and groups, allowing an analysis of meats, dairy, frozen goods, and shelf-stable food. The CPI displays a price of each food item by month of a given year, and was subsequently cleaned to find the average of a given year. Limitations in the history of the data only allow for analysis from 2017 up to 2022. Once the data was cleaned, a cost rate (the difference in price of a given year against the previous year) was calculated to show the change in price in order to measure the food item against inflation. It is important to note that, since the data only extends to 2017, a cost rate analysis from the years 2018 to 2022. 
+
+The rate of inflation measurements similarly recorded data month-to-month and required cleaning to show the yearly average. Although the inflation rate data set provided a far more robust history, only the years 2017 to 2022 were included in this analysis as inflation was only used as a comparison against food cost rates. 
+
+\newpage
+
+## Results
 ### Bacon (per 500 grams)
+The cost of bacon fluctuated significantly over the analyzed time period. On average, the cost of bacon increased by 5.39% while the inflation rate increased by 3.04%. The highest price increase was between 2020 and 2021, which saw an increase 12.97% from \$5.86 to \$6.62. Prior to 2021, the cost increase of bacon fell within a roughly 1% margin of the inflation rate, although after 2020 the cost increased at a rate far greater than inflation.
 
 ```{r}
 #| messages: false
 #| echo: false
 #| warning: false
-#| label: fig-3
-#| fig-cap: "Inflation Rate vs. Cost of Bacon (since 2017)"
-#| fig-align: center
-#| fig-width: 10
-#| fig-height: 3
-#### Create graphs plotting mandated and actual response times ####
-bacon <- grocery_data |>
-  # Plot graphs, define x axis
-  ggplot(aes(x = year, y = grocery_data$bacon, group = 1)) +
-
-  # Define axis labels
-  labs(
-    y = "Cost ($)",
-    x = "Year"
-  ) +
-
-  # Set the theme
-  theme_minimal() +
-  
-  # Define styles for axis and labels
-  theme(
-    axis.title.x = element_text(size = 15),
-    axis.text.x = element_text(size = 14, angle = 50, vjust = 0.5),
-    axis.title.y = element_text(size = 15),
-    axis.text.y = element_text(size = 14),
-  ) +
-  
-  scale_y_continuous(limits=c(5, 10)) +
-
-  # Render lines
-  geom_line()
-
-grid.arrange(bacon, inflation_graph, ncol=2)
-```
-
-```{r}
-#| messages: false
-#| echo: false
-#| warning: false
-#| label: fig-4
-#| fig-cap: "Bacon Cost Rate and Inflation (since 2017)"
-#| fig-align: center
-#| fig-width: 10
-#| fig-height: 3
 #### Create graphs plotting mandated and actual response times ####
 # Define colors to be used in legend
 bacon_table <- grocery_data |>
@@ -159,15 +110,68 @@ bacon_inflation_data <-
   mutate(percent_change = round((((bacon - lag(bacon, 1)) / lag(bacon, 1)) * 100), digits = 2)) |> 
 
   # Remove empty rows
-  drop_na() |>
+  drop_na()
+```
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-1
+#| fig-cap: "Cost of Bacon Rate vs. Inflation Rate, graph (since 2018)"
+#| fig-align: center
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+colors <- c(
+  "Cost of Bacon" = "steelblue",
+  "Inflation" = "darkred"
+)
+
+ggplot() +
+  # Define axis labels
+  labs(
+    y = "Rate (%)",
+    x = "Year",
+    color = "Legend"
+  ) +
+  
+  # Set the theme
+  theme_minimal() +
+  
+  # Import the happy negative data for the line
+  geom_line(data = bacon_inflation_data, aes(x = year, y = percent_change, color = "Cost of Bacon", group = 1)) +
+  
+  # Import the homeless negative data for the line
+  geom_line(data = bacon_inflation_data, aes(x = year, y = inflation_rate, color =  "Inflation", group = 1)) +
+  
+  # Set scales to only be years where data is provided
+  # scale_x_continuous(breaks = c(2002, 2004, 2012, 2014)) +
+  ylim(0,15) +
+  
+  # Set colors for the graph
+  scale_color_manual(values = colors)
+```
+
+@fig-1 graphs the cost rate of bacon against the rate of inflation between 2018 and 2022. This graph assists in visualizing the differences between the two rates, highlighting the significant increase in 2021 compared to the relatively stable rates of the three prior years. The graph also shows that, in 2022, the cost rate lowered significantly and may indicate an eventual return to previous levels (where bacon remained in consistent margins with inflation).
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-2
+#| fig-cap: "Cost of Bacon Rate vs. Inflation Rate, data (since 2018)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+bacon_table_display <- bacon_inflation_data |>
+  # Order the columns 
+  select(year, bacon, percent_change, inflation_rate) |> 
   
   # Change months to fiscal quarters
   mutate(bacon =  paste("\\$", bacon, sep = "")) |>
   mutate(percent_change =  paste(percent_change, "\\%", sep = "")) |>
   mutate(inflation_rate =  paste(inflation_rate, "\\%", sep = "")) |>
-  
-  # Order the columns 
-  select(year, bacon, percent_change, inflation_rate) |> 
   
   # Rename the columns
   rename(
@@ -177,64 +181,22 @@ bacon_inflation_data <-
     "Bacon Cost Rate" = "percent_change"
   )
 
-bacon_inflation_data |>
+bacon_table_display |>
   knitr::kable(align = "l", booktabs = TRUE, escape = FALSE, linesep = "" )|>
   kable_styling(font_size = 10, latex_options = "hold_position", full_width = TRUE)
-
 ```
 
-\newpage
+@fig-2 shows a breakdown of the data by year, comparing the raw cost (in $CAD), the cost rate, and the inflation rate. 
+
+In the given time period, bacon was not a reliable metric for monitoring inflation due to the drastic increase in 2021, along with the still relatively high increase in 2022. Because of this, bacon should not be used to track inflation but may prove to be a reliable indicator in the future.
 
 ### Eggs (per 1 dozen)
+The increase of the cost of eggs remained above the rate of inflation, by statistically significant margins, over the analyzed time period. On average, the cost of eggs increased by 6.66% while the inflation rate increased by 3.04%, showing increases more than double inflation. The highest price increase was between 2019 and 2020, which saw an increase 9.41% from \$3.4 to \$3.72. Due to the relatively low cost of eggs, a price increase in the single digits typically amounts to less-visible changes year-over-year. When viewing the increase over a greater period of time, this change is more visible. 
 
 ```{r}
 #| messages: false
 #| echo: false
 #| warning: false
-#| label: fig-7
-#| fig-cap: "Inflation Rate vs. Cost of Eggs (since 2017)"
-#| fig-align: center
-#| fig-width: 10
-#| fig-height: 3
-#### Create graphs plotting mandated and actual response times ####
-eggs <- grocery_data |>
-  # Plot graphs, define x axis
-  ggplot(aes(x = year, y = grocery_data$eggs, group = 1)) +
-
-  # Define axis labels
-  labs(
-    y = "Cost ($)",
-    x = "Year"
-  ) +
-
-  # Set the theme
-  theme_minimal() +
-
-  # Define styles for axis and labels
-  theme(
-    axis.title.x = element_text(size = 15),
-    axis.text.x = element_text(size = 14, angle = 50, vjust = 0.5),
-    axis.title.y = element_text(size = 15),
-    axis.text.y = element_text(size = 14),
-  ) +
-  
-  scale_y_continuous(limits=c(0, 5)) +
-
-  # Render lines
-  geom_line()
-
-grid.arrange(eggs, inflation_graph, ncol=2)
-```
-
-```{r}
-#| messages: false
-#| echo: false
-#| warning: false
-#| label: fig-8
-#| fig-cap: "Eggs Cost Rate and Inflation (since 2017)"
-#| fig-align: center
-#| fig-width: 10
-#| fig-height: 3
 #### Create graphs plotting mandated and actual response times ####
 # Define colors to be used in legend
 eggs_table <- grocery_data |>
@@ -253,15 +215,68 @@ eggs_inflation_data <-
   mutate(percent_change = round((((eggs - lag(eggs, 1)) / lag(eggs, 1)) * 100), digits = 2)) |> 
 
   # Remove empty rows
-  drop_na() |>
+  drop_na()
+```
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-3
+#| fig-cap: "Cost of Eggs Rate vs. Inflation Rate, graph (since 2018)"
+#| fig-align: center
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+colors <- c(
+  "Cost of Eggs" = "steelblue",
+  "Inflation" = "darkred"
+)
+
+ggplot() +
+  # Define axis labels
+  labs(
+    y = "Rate (%)",
+    x = "Year",
+    color = "Legend"
+  ) +
+  
+  # Set the theme
+  theme_minimal() +
+  
+  # Import the happy negative data for the line
+  geom_line(data = eggs_inflation_data, aes(x = year, y = percent_change, color = "Cost of Eggs", group = 1)) +
+  
+  # Import the homeless negative data for the line
+  geom_line(data = eggs_inflation_data, aes(x = year, y = inflation_rate, color =  "Inflation", group = 1)) +
+  
+  # Set scales to only be years where data is provided
+  # scale_x_continuous(breaks = c(2002, 2004, 2012, 2014)) +
+  ylim(0,15) +
+  
+  # Set colors for the graph
+  scale_color_manual(values = colors)
+```
+
+@fig-3 graphs the cost rate of eggs against the rate of inflation between 2018 and 2022. This graph assists in visualizing the differences between the two rates, highlighting the consistently high cost increases when compared to inflation. The graph also shows that, in 2022, the cost rate lowered significantly to within 0.45%.
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-4
+#| fig-cap: "Cost of Eggs Rate vs. Inflation Rate, data (since 2018)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+eggs_table_display <- eggs_inflation_data |>
+  # Order the columns 
+  select(year, eggs, percent_change, inflation_rate) |> 
   
   # Change months to fiscal quarters
   mutate(eggs =  paste("\\$", eggs, sep = "")) |>
   mutate(percent_change =  paste(percent_change, "\\%", sep = "")) |>
   mutate(inflation_rate =  paste(inflation_rate, "\\%", sep = "")) |>
-  
-  # Order the columns 
-  select(year, eggs, percent_change, inflation_rate) |> 
   
   # Rename the columns
   rename(
@@ -271,65 +286,22 @@ eggs_inflation_data <-
     "Eggs Cost Rate" = "percent_change"
   )
 
-eggs_inflation_data |>
+eggs_table_display |>
   knitr::kable(align = "l", booktabs = TRUE, escape = FALSE, linesep = "" )|>
   kable_styling(font_size = 10, latex_options = "hold_position", full_width = TRUE)
-
 ```
 
-\newpage
+@fig-4 shows a breakdown of the data by year, comparing the raw cost (in $CAD), the cost rate, and the inflation rate. 
+
+In the given time period, eggs were not a reliable metric for monitoring inflation due to its consistent high increases comparative to inflation. The relatively low cost of eggs also makes this difference far less visible over the short term. Because of these factors, eggs should not be used to track inflation.
 
 ### Chicken Breasts (per 3 kilograms)
+The cost of chicken fluctuated significantly over the analyzed time period, falling either below or above the year's inflation rate by statistically significant margins. On average, the cost of eggs increased by 4.28% while the inflation rate increased by 3.04%, showing increases more than double inflation. The highest price increase was between 2021 and 2022, which saw an increase 13.01% from \$12.84 to \$14.51. The relatively high cost of chicken makes cost changes far more visible to consumers, thus having a significant influence on the perception of inflation.
 
 ```{r}
 #| messages: false
 #| echo: false
 #| warning: false
-#| label: fig-1
-#| fig-cap: "Inflation Rate vs. Cost of Chicken Breasts (since 2017)"
-#| fig-align: center
-#| fig-width: 10
-#| fig-height: 3
-#### Create graphs plotting mandated and actual response times ####
-# Define colors to be used in legend
-chicken_graph <- grocery_data |>
-  # Plot graphs, define x axis
-  ggplot(aes(x = year, y = grocery_data$chicken, group = 1)) +
-
-  # Define axis labels
-  labs(
-    y = "Cost ($)",
-    x = "Year"
-  ) +
-
-  # Set the theme
-  theme_minimal() +
-
-  # Define styles for axis and labels
-  theme(
-    axis.title.x = element_text(size = 15),
-    axis.text.x = element_text(size = 14, angle = 50, vjust = 0.5),
-    axis.title.y = element_text(size = 15),
-    axis.text.y = element_text(size = 14),
-  ) +
-  
-  scale_y_continuous(limits=c(10, 15)) +
-
-  # Render lines
-  geom_line()
-
-grid.arrange(chicken_graph, inflation_graph, ncol=2)
-```
-
-```{r}
-#| messages: false
-#| echo: false
-#| warning: false
-#| label: fig-2
-#| fig-cap: "Price of Chicken Breasts Cost Rate and Inflation (since 2017)"
-#| fig-align: center
-#| fig-width: 10
-#| fig-height: 3
 #### Create graphs plotting mandated and actual response times ####
 # Define colors to be used in legend
 chicken_table <- grocery_data |>
@@ -346,94 +318,95 @@ chicken_inflation_data <-
   
   # Calculate the percent change of chicken prices
   mutate(percent_change = round((((chicken - lag(chicken, 1)) / lag(chicken, 1)) * 100), digits = 2)) |> 
-  
+
   # Remove empty rows
-  drop_na() |>
-  
-  # Change months to fiscal quarters
-  mutate(chicken =  paste("\\$", chicken, sep = "")) |>
-  mutate(percent_change =  paste(percent_change, "\\%", sep = "")) |>
-  mutate(inflation_rate =  paste(inflation_rate, "\\%", sep = "")) |>
-
-  # Order the columns 
-  select(year, chicken, percent_change, inflation_rate) |>
-  
-  # Rename the columns
-  rename(
-    "Year" = "year",
-    "Chicken Cost" = "chicken",
-    "Inflation Rate" = "inflation_rate",
-    "Chicken Cost Rate" = "percent_change"
-  )
-
-# summary <- chicken_inflation_data |>
-#     summarize(across(where(is.numeric), mean, na.rm = TRUE))
-# 
-# chicken_inflation_data <- bind_rows(
-#   chicken_inflation_data,
-#   summary
-# )
-# summary
-
-chicken_inflation_data |>
-  knitr::kable(align = "l", booktabs = TRUE, escape = FALSE, linesep = "" )|>
-  kable_styling(font_size = 10, latex_options = "hold_position", full_width = TRUE)
-  # pack_rows("Average", start_row = 6, end_row = 6)
-
+  drop_na()
 ```
-
-\newpage
-
-### Milk (per 2 litres)
 
 ```{r}
 #| messages: false
 #| echo: false
 #| warning: false
 #| label: fig-5
-#| fig-cap: "Inflation Rate vs. Cost of Milk (since 2017)"
+#| fig-cap: "Cost of Chicken Rate vs. Inflation Rate, graph (since 2018)"
 #| fig-align: center
-#| fig-width: 10
 #| fig-height: 3
 #### Create graphs plotting mandated and actual response times ####
-milk <- grocery_data |>
-  # Plot graphs, define x axis
-  ggplot(aes(x = year, y = grocery_data$milk, group = 1)) +
+colors <- c(
+  "Cost of Chicken" = "steelblue",
+  "Inflation" = "darkred"
+)
 
+ggplot() +
   # Define axis labels
   labs(
-    y = "Cost ($)",
-    x = "Year"
-  ) +
-
-  # Set the theme
-  theme_minimal() +
-
-  # Define styles for axis and labels
-  theme(
-    axis.title.x = element_text(size = 15),
-    axis.text.x = element_text(size = 14, angle = 50, vjust = 0.5),
-    axis.title.y = element_text(size = 15),
-    axis.text.y = element_text(size = 14),
+    y = "Rate (%)",
+    x = "Year",
+    color = "Legend"
   ) +
   
-  scale_y_continuous(limits=c(0, 5)) +
-
-  # Render lines
-  geom_line()
-
-grid.arrange(milk, inflation_graph, ncol=2)
+  # Set the theme
+  theme_minimal() +
+  
+  # Import the happy negative data for the line
+  geom_line(data = chicken_inflation_data, aes(x = year, y = percent_change, color = "Cost of Chicken", group = 1)) +
+  
+  # Import the homeless negative data for the line
+  geom_line(data = chicken_inflation_data, aes(x = year, y = inflation_rate, color =  "Inflation", group = 1)) +
+  
+  # Set scales to only be years where data is provided
+  # scale_x_continuous(breaks = c(2002, 2004, 2012, 2014)) +
+  ylim(-1,15) +
+  
+  # Set colors for the graph
+  scale_color_manual(values = colors)
 ```
+
+@fig-5 graphs the cost rate of chicken against the rate of inflation between 2018 and 2022. This graph assists in visualizing the differences between the two rates, highlighting the drastic cost fluctuations when compared to inflation. The graph also shows that, prior to 2020, chicken breasts appeared relatively inflation-resistant increasing at 0.08% in 2018 and lowering in price by 0.25% in 2019. In 2022, however, the cost of chicken increased significantly by 13.01%, a rate almost double that of inflation. 
 
 ```{r}
 #| messages: false
 #| echo: false
 #| warning: false
 #| label: fig-6
-#| fig-cap: "Milk Cost Rate and Inflation (since 2017)"
+#| fig-cap: "Cost of Chicken Rate vs. Inflation Rate, data (since 2018)"
 #| fig-align: center
 #| fig-width: 10
 #| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+chicken_table_display <- chicken_inflation_data |>
+  # Order the columns 
+  select(year, chicken, percent_change, inflation_rate) |> 
+  
+  # Change months to fiscal quarters
+  mutate(chicken =  paste("\\$", chicken, sep = "")) |>
+  mutate(percent_change =  paste(percent_change, "\\%", sep = "")) |>
+  mutate(inflation_rate =  paste(inflation_rate, "\\%", sep = "")) |>
+  
+  # Rename the columns
+  rename(
+    "Year" = "year", 
+    "Chicken Cost" = "chicken", 
+    "Inflation Rate" = "inflation_rate", 
+    "Chicken Cost Rate" = "percent_change"
+  )
+
+chicken_table_display |>
+  knitr::kable(align = "l", booktabs = TRUE, escape = FALSE, linesep = "" )|>
+  kable_styling(font_size = 10, latex_options = "hold_position", full_width = TRUE)
+```
+
+@fig-6 shows a breakdown of the data by year, comparing the raw cost (in $CAD), the cost rate, and the inflation rate. 
+
+In the given time period, chicken breasts were not a reliable metric for monitoring inflation due to its drastic cost fluctuations compared to inflation. With the cost falling below and then rising well above inflation rates, the cost of chicken breasts were far too inconsistent to reliably track inflation. Although the price of chicken makes differences visible enough for consumers to recognize, the sporadic increases do not suggest any relationship between the two metrics. 
+
+### Milk (per 2 litres)
+The cost of milk generally increased at a rate parallel to inflation. On average, the cost of eggs increased by 3.49% while the inflation rate increased by 3.04%. The most significant price increase---an outlier in this dataset due to the COVID-19 pandemic---was between 2019 and 2020, which saw an increase 3.83% from \$4.18 to \$4.34. Although this was the most numerically significant increase, it was not the highest as the cost increased by 6.94% from 2021 to 2022---although this price increase roughly matched the inflation rate of 6.8%. 
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
 #### Create graphs plotting mandated and actual response times ####
 # Define colors to be used in legend
 milk_table <- grocery_data |>
@@ -448,19 +421,72 @@ milk_inflation_data <-
     all.x = TRUE
   ) |>
   
-  # Calculate the percent change of chicken prices
+  # Calculate the percent change of milk prices
   mutate(percent_change = round((((milk - lag(milk, 1)) / lag(milk, 1)) * 100), digits = 2)) |> 
 
   # Remove empty rows
-  drop_na() |>
+  drop_na()
+```
+\newpage
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-7
+#| fig-cap: "Cost of Milk Rate vs. Inflation Rate, graph (since 2018)"
+#| fig-align: center
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+colors <- c(
+  "Cost of Milk" = "steelblue",
+  "Inflation" = "darkred"
+)
+
+ggplot() +
+  # Define axis labels
+  labs(
+    y = "Rate (%)",
+    x = "Year",
+    color = "Legend"
+  ) +
+  
+  # Set the theme
+  theme_minimal() +
+  
+  # Import the happy negative data for the line
+  geom_line(data = milk_inflation_data, aes(x = year, y = percent_change, color = "Cost of Milk", group = 1)) +
+  
+  # Import the homeless negative data for the line
+  geom_line(data = milk_inflation_data, aes(x = year, y = inflation_rate, color =  "Inflation", group = 1)) +
+  
+  # Set scales to only be years where data is provided
+  # scale_x_continuous(breaks = c(2002, 2004, 2012, 2014)) +
+  ylim(-1,15) +
+  
+  # Set colors for the graph
+  scale_color_manual(values = colors)
+```
+
+@fig-7 graphs the cost rate of milk against the rate of inflation between 2018 and 2022. This graph assists in visualizing the differences between the two rates, highlighting the similarities between the rates. The graph also shows that, prior to and after 2020, milk remained relatively consisted when compared to yearly inflation rates.
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-8
+#| fig-cap: "Cost of Milk Rate vs. Inflation Rate, data (since 2018)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+milk_table_display <- milk_inflation_data |>
+  # Order the columns 
+  select(year, milk, percent_change, inflation_rate) |> 
   
   # Change months to fiscal quarters
   mutate(milk =  paste("\\$", milk, sep = "")) |>
   mutate(percent_change =  paste(percent_change, "\\%", sep = "")) |>
   mutate(inflation_rate =  paste(inflation_rate, "\\%", sep = "")) |>
-  
-  # Order the columns 
-  select(year, milk, percent_change, inflation_rate) |> 
   
   # Rename the columns
   rename(
@@ -470,64 +496,22 @@ milk_inflation_data <-
     "Milk Cost Rate" = "percent_change"
   )
 
-milk_inflation_data |>
+milk_table_display |>
   knitr::kable(align = "l", booktabs = TRUE, escape = FALSE, linesep = "" )|>
   kable_styling(font_size = 10, latex_options = "hold_position", full_width = TRUE)
-
 ```
 
-\newpage
+@fig-8 shows a breakdown of the data by year, comparing the raw cost (in $CAD), the cost rate, and the inflation rate. 
+
+In the given time period, milk appeared to be a reliable metric for tracking inflation rates in Canada. With the cost remaining relatively stable between \$4 and \$5, the increase is small but noticeable. Throughout the observed period, excluding the year 2020, the cost increase of milk remained within less than a 1% margin when compared to interest rates and thus may prove to be a reliable grocery store item for generally tracking inflation. 
 
 ### Frozen Peas (per 750 grams)
+The cost of frozen peas consistently increased at rates low enough to suggest inflation-resistance. On average, the cost of frozen peas increased by 2.59% in the observed period while the inflation rate rose by 3.04%. The cost did not increase between 2017 and 2018, leading to a possible market adjustment of 4.63% in 2019. Generally, aside from the year 2020, which influenced costs across the industry, the cost of frozen peas remained below interest rates. 
 
 ```{r}
 #| messages: false
 #| echo: false
 #| warning: false
-#| label: fig-9
-#| fig-cap: "Frozen Peas Cost Rate and Inflation (since 2017)"
-#| fig-align: center
-#| fig-width: 10
-#| fig-height: 3
-#### Create graphs plotting mandated and actual response times ####
-frozen_peas <- grocery_data |>
-  # Plot graphs, define x axis
-  ggplot(aes(x = year, y = grocery_data$frozen_peas, group = 1)) +
-
-  # Define axis labels
-  labs(
-    y = "Cost ($)",
-    x = "Year"
-  ) +
-
-  # Set the theme
-  theme_minimal() +
-
-  # Define styles for axis and labels
-  theme(
-    axis.title.x = element_text(size = 15),
-    axis.text.x = element_text(size = 14, angle = 50, vjust = 0.5),
-    axis.title.y = element_text(size = 15),
-    axis.text.y = element_text(size = 14),
-  ) +
-
-  scale_y_continuous(limits=c(0, 5)) +
-  
-  # Render lines
-  geom_line()
-
-grid.arrange(frozen_peas, inflation_graph, ncol=2)
-```
-
-```{r}
-#| messages: false
-#| echo: false
-#| warning: false
-#| label: fig-10
-#| fig-cap: "Inflation Rate vs. Cost of Frozen Peas (since 2017)"
-#| fig-align: center
-#| fig-width: 10
-#| fig-height: 3
 #### Create graphs plotting mandated and actual response times ####
 # Define colors to be used in legend
 frozen_peas_table <- grocery_data |>
@@ -542,85 +526,97 @@ frozen_peas_inflation_data <-
     all.x = TRUE
   ) |>
   
-  # Calculate the percent change of chicken prices
-  mutate(percent_change = round((((frozen_peas - lag(frozen_peas, 1)) / lag(frozen_peas, 1)) * 100), digits = 2)) |> 
+  # Calculate the percent change of frozen_peas prices
+  mutate(percent_change = round((((frozen_peas - lag(frozen_peas)) / lag(frozen_peas, 1)) * 100), digits = 2)) |> 
 
   # Remove empty rows
-  drop_na() |>
+  drop_na()
+```
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-9
+#| fig-cap: "Cost of Frozen Peas Rate vs. Inflation Rate, graph (since 2018)"
+#| fig-align: center
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+colors <- c(
+  "Cost of Frozen Peas" = "steelblue",
+  "Inflation" = "darkred"
+)
+
+ggplot() +
+  # Define axis labels
+  labs(
+    y = "Rate (%)",
+    x = "Year",
+    color = "Legend"
+  ) +
+  
+  # Set the theme
+  theme_minimal() +
+  
+  # Import the happy negative data for the line
+  geom_line(data = frozen_peas_inflation_data, aes(x = year, y = percent_change, color = "Cost of Frozen Peas", group = 1)) +
+  
+  # Import the homeless negative data for the line
+  geom_line(data = frozen_peas_inflation_data, aes(x = year, y = inflation_rate, color =  "Inflation", group = 1)) +
+  
+  # Set scales to only be years where data is provided
+  # scale_x_continuous(breaks = c(2002, 2004, 2012, 2014)) +
+  ylim(-1,15) +
+  
+  # Set colors for the graph
+  scale_color_manual(values = colors)
+```
+
+@fig-9 graphs the cost rate of frozen peas against the rate of inflation between 2018 and 2022. This graph assists in visualizing the differences between the two rates, highlighting the relatively low increases in cost when compared to inflation. The graph also shows that, prior to and after 2020, frozen peas remained below yearly inflation rates---aside from the aforementioned possible adjustment between 2018 and 2019.
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-10
+#| fig-cap: "Cost of Frozen Peas Rate vs. Inflation Rate, data (since 2018)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+frozen_peas_table_display <- frozen_peas_inflation_data |>
+  # Order the columns 
+  select(year, frozen_peas, percent_change, inflation_rate) |> 
   
   # Change months to fiscal quarters
   mutate(frozen_peas =  paste("\\$", frozen_peas, sep = "")) |>
   mutate(percent_change =  paste(percent_change, "\\%", sep = "")) |>
   mutate(inflation_rate =  paste(inflation_rate, "\\%", sep = "")) |>
   
-  # Order the columns 
-  select(year, frozen_peas, percent_change, inflation_rate) |> 
-  
   # Rename the columns
   rename(
     "Year" = "year", 
     "Frozen Peas Cost" = "frozen_peas", 
     "Inflation Rate" = "inflation_rate", 
-    "Frozen Peas Cost Rate" = "percent_change"
+    "Frozen peas Cost Rate" = "percent_change"
   )
 
-frozen_peas_inflation_data |>
+frozen_peas_table_display |>
   knitr::kable(align = "l", booktabs = TRUE, escape = FALSE, linesep = "" )|>
   kable_styling(font_size = 10, latex_options = "hold_position", full_width = TRUE)
 ```
 
-\newpage
+@fig-10 shows a breakdown of the data by year, comparing the raw cost (in $CAD), the cost rate, and the inflation rate. 
+
+In the given time period, frozen peas appeared relatively relation-resistant. Although a significant finding, inflation-resistance does not assist consumers in tracking the nation's inflation rates and thus frozen peas are not suited for such a task. 
 
 ### Pasta Sauce (per 650 millilitres)
+As a shelf-stable food item, pasta sauce possessed the opportunity to display an ability to track or resist inflation. Despite these assumptions, pasta sauce generally increased at rates greater than that of yearly inflation. On average, the cost of eggs increased by 5.71% over the observed period while the inflation rate increased by 3.04%. The highest price increase was between 2021 and 2022, which saw an increase 12.7% from \$2.44 to \$2.75. Generally, aside from 2018 when the cost increase was below interest rates, the cost of pasta sauce remained above the rate of inflation. In 2020 and in 2022, the difference was 6%. 
 
 ```{r}
 #| messages: false
 #| echo: false
 #| warning: false
-#| label: fig-11
-#| fig-cap: "Inflation Rate vs. Cost of Pasta Sauce (since 2017)"
-#| fig-align: center
-#| fig-width: 10
-#| fig-height: 3
-#### Create graphs plotting mandated and actual response times ####
-pasta_sauce <- grocery_data |>
-  # Plot graphs, define x axis
-  ggplot(aes(x = year, y = grocery_data$pasta_sauce, group = 1)) +
-
-  # Define axis labels
-  labs(
-    y = "Cost ($)",
-    x = "Year"
-  ) +
-
-  # Set the theme
-  theme_minimal() +
-
-  # Define styles for axis and labels
-  theme(
-    axis.title.x = element_text(size = 15),
-    axis.text.x = element_text(size = 14, angle = 50, vjust = 0.5),
-    axis.title.y = element_text(size = 15),
-    axis.text.y = element_text(size = 14),
-  ) +
-  
-  scale_y_continuous(limits=c(0, 5)) +
-
-  # Render lines
-  geom_line()
-
-grid.arrange(pasta_sauce, inflation_graph, ncol = 2)
-```
-
-```{r}
-#| messages: false
-#| echo: false
-#| warning: false
-#| label: fig-12
-#| fig-cap: "Pasta Sauce Cost Rate and Inflation (since 2017)"
-#| fig-align: center
-#| fig-width: 10
-#| fig-height: 3
 #### Create graphs plotting mandated and actual response times ####
 # Define colors to be used in legend
 pasta_sauce_table <- grocery_data |>
@@ -635,38 +631,115 @@ pasta_sauce_inflation_data <-
     all.x = TRUE
   ) |>
   
-  # Calculate the percent change of chicken prices
-  mutate(percent_change = round((((pasta_sauce - lag(pasta_sauce, 1)) / lag(pasta_sauce, 1)) * 100), digits = 2)) |> 
+  # Calculate the percent change of pasta_sauce prices
+  mutate(percent_change = round((((pasta_sauce - lag(pasta_sauce)) / lag(pasta_sauce, 1)) * 100), digits = 2)) |> 
 
   # Remove empty rows
-  drop_na() |>
+  drop_na()
+```
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-11
+#| fig-cap: "Cost of Pasta Sauce Rate vs. Inflation Rate, graph (since 2018)"
+#| fig-align: center
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+colors <- c(
+  "Cost of Pasta Sauce" = "steelblue",
+  "Inflation" = "darkred"
+)
+
+ggplot() +
+  # Define axis labels
+  labs(
+    y = "Rate (%)",
+    x = "Year",
+    color = "Legend"
+  ) +
+  
+  # Set the theme
+  theme_minimal() +
+  
+  # Import the happy negative data for the line
+  geom_line(data = pasta_sauce_inflation_data, aes(x = year, y = percent_change, color = "Cost of Pasta Sauce", group = 1)) +
+  
+  # Import the homeless negative data for the line
+  geom_line(data = pasta_sauce_inflation_data, aes(x = year, y = inflation_rate, color =  "Inflation", group = 1)) +
+  
+  # Set scales to only be years where data is provided
+  # scale_x_continuous(breaks = c(2002, 2004, 2012, 2014)) +
+  ylim(-1,15) +
+  
+  # Set colors for the graph
+  scale_color_manual(values = colors)
+```
+
+@fig-11 graphs the cost rate of pasta sauce against the rate of inflation between 2018 and 2022. This graph assists in visualizing the differences between the two rates, demonstrating how pasta sauce generally increased at rates above inflation. 
+
+```{r}
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-12
+#| fig-cap: "Cost of Pasta Sauce Rate vs. Inflation Rate, data (since 2018)"
+#| fig-align: center
+#| fig-width: 10
+#| fig-height: 3
+#### Create graphs plotting mandated and actual response times ####
+pasta_sauce_table_display <- pasta_sauce_inflation_data |>
+  # Order the columns 
+  select(year, pasta_sauce, percent_change, inflation_rate) |> 
   
   # Change months to fiscal quarters
   mutate(pasta_sauce =  paste("\\$", pasta_sauce, sep = "")) |>
   mutate(percent_change =  paste(percent_change, "\\%", sep = "")) |>
   mutate(inflation_rate =  paste(inflation_rate, "\\%", sep = "")) |>
   
-  # Order the columns 
-  select(year, pasta_sauce, percent_change, inflation_rate) |> 
-  
   # Rename the columns
   rename(
     "Year" = "year", 
     "Pasta Sauce Cost" = "pasta_sauce", 
     "Inflation Rate" = "inflation_rate", 
-    "Pasta Sauce Cost Rate" = "percent_change"
+    "Frozen peas Cost Rate" = "percent_change"
   )
 
-pasta_sauce_inflation_data |>
+pasta_sauce_table_display |>
   knitr::kable(align = "l", booktabs = TRUE, escape = FALSE, linesep = "" )|>
   kable_styling(font_size = 10, latex_options = "hold_position", full_width = TRUE)
 ```
+\newpage
+@fig-12 shows a breakdown of the data by year, comparing the raw cost (in $CAD), the cost rate, and the inflation rate. 
+
+In the given time period, generally pasta sauce remained above yearly inflation rates and is not suitable for tracking Canada's inflation rate. With the cost increase peaking at 6% in two of the five observed years, pasta sauce defied expectations by consistently remaining at rates above inflation. 
 
 \newpage
 
-## Results
+## Model
+Generally, the rate of inflation is a year-over-year (although it may also be measured quarter-over-quarter or month-over-month) change in the Consumer Price Index (CPI). The equation used to represent this change rate is as follows, with CPI~1~ representing the present CPI and CPI~2~ representing the previous year (or quarter):
+
+$$
+Inflation \:Rate = \frac{CPI_1 - CPI_2}{CPI_2} \cdot 100
+$$
+\
+This equation, however, is insufficient in serving as a true model to forecast inflation. Economists and financial analysts spent decades developing detailed models to forecast inflation, among other relevant economic indicators. The Bank of Canada uses the Terms-of-Trade Economic Model (ToTEM) as its main dynamic stochastic general equilibrium (DSGE) model. A white paper by @cite_boc_model explains this model in-depth, accurate as of 2021, and should be used to model and forecast inflation rates. 
+
+\newpage
 
 ## Discussion
+Groceries generally proved ineffective at tracking Canada's inflation rates. Although the yearly increase in the cost of milk demonstrated promise in matching in inflation rates, all other selected products proved ineffective at tracking inflation---often either well above or below yearly rates. Groceries may play a significant factor in influencing the perception of inflation, but Canadians should not rely on groceries alone as inflation metrics. 
+
+One possible reason for groceries' ability to defy inflation rates is because of the weight given to the various Consumer Price Index categories. Food in general, including restaurants, accounted for 15.75% of the CPI, with groceries making up 10.93% of the total CPI [@cite_statcan_cpi_basket]. As one of the most frequently purchased consumer goods, groceries may seem reflective of inflation because the cost of groceries often increases at rates surpassing inflation. 
+
+A high increase in the cost of groceries, however, may be attributed to a number of factors external to this study. 
+
+One example of an external factor is "food inflation," or the impact of climate change and high transportation costs, "as a result of higher oil prices" [@cite_food_price_report]. When consider the raw cost of food, examining the entire supply chain is required to fully understand the cost. Changes in production, transport, and sellers may increase---or decrease---the cost of food beyond the influence of inflation. 
+
+Another example of an external factor is "greedflation," or the "taking advantage of high inflationary times to earn excessive profits at the expense of consumers who have limited choice in grocery shopping" [@cite_food_price_report]. Large Canadian grocery chains are currently in the spotlight for price gouging, taking advantage of the high costs created by the recent pandemic. This question is so significant that Canada's Competition Bureau launched a study of grocery store competition in October 2022, examining "to what extent are higher grocery prices a result of changing competitive dynamics" [@cite_competition_bureau]. Roughly 80% of Canadians claim "abuse in the system" by grocery stores, placing the blame for high costs squarely on corporations [@cite_toronto_sun]. A review of the largest Canadian grocery chains found "flat" performance in the income of these chains, "when compared to the increase in the cost of living," and "yields were usually below or at the same level as the rate of food inflation" in the observed 5-year period [@cite_toronto_sun].
+
+This analysis reveals that, as a whole, Canadians should not trust the cost of groceries to measure and monitor inflation. However, it did reveal that some groceries, like milk, show potential for paralleling inflation. Although, as this discussion revealed, the CPI weighs each category and thus the groceries that currently show promise for tracking inflation may not always possess such a quality. As Canadians continue to see weakened spending power, compounded by a higher cost of living, they should remain vigilant in understanding inflation, the factors that cause it, and the impact it has on various industries. Unfortunately, Canadians will have to look elsewhere for a practical, every-day method of monitoring inflation. 
 
 \newpage
 
@@ -680,21 +753,23 @@ This statement was originally prepared in consultation with First Nations House 
 
 **Data Acknowledgement**
 
-The data used in this paper was obtained through Open Data Toronto, an initiative to provide openly accessible data about the city [@cite_about_opendatatoronto]. This paper uses three data sets from Open Data Toronto, each provided by the Toronto Paramedic Services:
+The data used in this paper was obtained through Statistics Canada and the Bank of Canada. The paper used two data sets:
 
--   Paramedic Services Incident Data[^1]
--   Land Ambulance Response Time Standard[^2]
--   Pre-Hospital Emergency Care Performance Metrics[^3]
+-   **Statistics Canada:** Monthly average retail prices for selected products[^1]
+-   **Bank of Canada:** Inflation: Definitions, graphs and data[^2]\
 
-[^1]: Paramedic Services Incident Data is available at: https://open.toronto.ca/dataset/paramedic-services-incident-data
+[^1]: Statistics Canada's "Monthly average retail prices for selected products" data set is available at: https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810024501
 
-[^2]: Land Ambulance Response Time Standard is available at: https://open.toronto.ca/dataset/land-ambulance-response-time-standard
-
-[^3]: Pre-Hospital Emergency Care Performance Metrics is available at: https://open.toronto.ca/dataset/pre-hospital-emergency-care-performance-metrics
+[^2]: The Bank of Canada's "Inflation: Definitions, graphs and data" data set is available at: https://bankofcanada.ca/rates/indicators/capacity-and-inflation-pressures/inflation
 
 **Resources Acknowledgment**
 
-The primary tool used to analyse data in this paper is R, an open-source statistical programming language [@cite_tool_r]. The paper also uses a number of R packages, including: dplyr [@cite_tool_dplyr], ggplot2 [@cite_tool_ggplot2], here [@cite_tool_here], janitor [@cite_tool_janitor], kableExtra [@cite_tool_kableextra], knitr [@cite_tool_knitr], lubridate [@cite_tool_lubridate], opendatatoronto [@cite_tool_opendatatoronto], readr [@cite_tool_readr], RColorBrewer [@cite_tool_rcolorbrewer], scales [@cite_tool_scales], and tidyverse [@cite_tool_tidyverse]. \newpage
+The primary tool used to analyse data in this paper is R, an open-source statistical programming language [@cite_tool_r]. The paper also uses a number of R packages, including: arrow [@cite_tool_arrow], dplyr [@cite_tool_dplyr], ggplot2 [@cite_tool_ggplot2], here [@cite_tool_here], janitor [@cite_tool_janitor], kableExtra [@cite_tool_kableextra], knitr [@cite_tool_knitr], lubridate [@cite_tool_lubridate], opendatatoronto [@cite_tool_opendatatoronto], readr [@cite_tool_readr], RColorBrewer [@cite_tool_rcolorbrewer], scales [@cite_tool_scales], and tidyverse [@cite_tool_tidyverse]. \
+
+**Peer Review**
+
+A special thank you to Chloe Thierstein, Linrong Li, and Sagith Kalaichelvam for reviewing and providing feedback on this paper.
+\newpage
 
 ## References
 
