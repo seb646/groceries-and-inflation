@@ -753,22 +753,22 @@ This statement was originally prepared in consultation with First Nations House 
 
 **Data Acknowledgement**
 
-The data used in this paper was obtained through Statistics Canada and the Bank of Canada. The paper used two data sets:
+The data used in this paper was obtained from Statistics Canada and the Bank of Canada. As the Bank of Canada uses data from Statistics Canada to create their data set, both of the data sets used in this paper are governed by the Statistics Canada Open Licence.[^1] The two data sets used in this paper are as follows: 
 
--   **Statistics Canada:** Monthly average retail prices for selected products[^1]
--   **Bank of Canada:** Inflation: Definitions, graphs and data[^2]\
+-   **Statistics Canada:** Monthly average retail prices for selected products[^2]
+-   **Bank of Canada:** Inflation: Definitions, graphs and data[^3]\
 
-[^1]: Statistics Canada's "Monthly average retail prices for selected products" data set is available at: https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810024501
-
-[^2]: The Bank of Canada's "Inflation: Definitions, graphs and data" data set is available at: https://bankofcanada.ca/rates/indicators/capacity-and-inflation-pressures/inflation
+[^1]: View the Statistics Canada Open License: https://statcan.gc.ca/en/reference/licence
+[^2]: Statistics Canada's "Monthly average retail prices for selected products" data set is available at: https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810024501
+[^3]: The Bank of Canada's "Inflation: Definitions, graphs and data" data set is available at: https://bankofcanada.ca/rates/indicators/capacity-and-inflation-pressures/inflation
 
 **Resources Acknowledgment**
 
 The primary tool used to analyse data in this paper is R, an open-source statistical programming language [@cite_tool_r]. The paper also uses a number of R packages, including: arrow [@cite_tool_arrow], dplyr [@cite_tool_dplyr], ggplot2 [@cite_tool_ggplot2], here [@cite_tool_here], janitor [@cite_tool_janitor], kableExtra [@cite_tool_kableextra], knitr [@cite_tool_knitr], lubridate [@cite_tool_lubridate], opendatatoronto [@cite_tool_opendatatoronto], readr [@cite_tool_readr], RColorBrewer [@cite_tool_rcolorbrewer], scales [@cite_tool_scales], and tidyverse [@cite_tool_tidyverse]. \
 
-**Peer Review**
+**Peer Acknowledgment**
 
-A special thank you to Chloe Thierstein, Linrong Li, and Sagith Kalaichelvam for reviewing and providing feedback on this paper.
+Thank you to Chloe Thierstein, Linrong Li, and Sagith Kalaichelvam for peer reviewing this paper and providing invaluable guidance and insight. 
 \newpage
 
 ## References
