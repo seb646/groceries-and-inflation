@@ -715,16 +715,7 @@ pasta_sauce_table_display |>
 
 In the given time period, generally pasta sauce remained above yearly inflation rates and is not suitable for tracking Canada's inflation rate. With the cost increase peaking at 6% in two of the five observed years, pasta sauce defied expectations by consistently remaining at rates above inflation. 
 
-\newpage
 
-## Model
-Generally, the rate of inflation is a year-over-year (although it may also be measured quarter-over-quarter or month-over-month) change in the Consumer Price Index (CPI). The equation used to represent this change rate is as follows, with CPI~1~ representing the present CPI and CPI~2~ representing the previous year (or quarter):
-
-$$
-Inflation \:Rate = \frac{CPI_1 - CPI_2}{CPI_2} \cdot 100
-$$
-\
-This equation, however, is insufficient in serving as a true model to forecast inflation. Economists and financial analysts spent decades developing detailed models to forecast inflation, among other relevant economic indicators. The Bank of Canada uses the Terms-of-Trade Economic Model (ToTEM) as its main dynamic stochastic general equilibrium (DSGE) model. A white paper by @cite_boc_model explains this model in-depth, accurate as of 2021, and should be used to model and forecast inflation rates. 
 
 \newpage
 
